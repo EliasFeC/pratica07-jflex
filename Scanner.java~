@@ -251,7 +251,7 @@ public class Scanner {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
-  // Variáveis para armazenar os campos extraídos.
+  // Variáveis pra armazenamento
   private String numero = "";
   private String titulo = "";
   private String data = "";
@@ -626,8 +626,7 @@ public class Scanner {
       if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
         zzAtEOF = true;
               {
-                System.out.println("----- Resultado da Extração -----");
-  System.out.println("Número: " + numero);
+                System.out.println("Número: " + numero);
   System.out.println("Título: " + titulo);
   System.out.println("Data de Publicação: " + data);
   System.out.println("Resumo: " + resumo);
@@ -638,7 +637,7 @@ public class Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { /* ignora demais caracteres */
+            { /* ignora os outros caracteres */
             } 
             // fall through
           case 8: break;
