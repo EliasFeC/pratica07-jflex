@@ -35,7 +35,7 @@ Reivindicações  = Claims
 
 //fim do arquivo como os campos da patente
 <<EOF>> {
-  System.out.println("Número: " + numero);
+  System.out.println("Patente: " + numero);
   System.out.println("Título: " + titulo);
   System.out.println("Data de Publicação: " + data);
   System.out.println("Resumo: " + resumo);
