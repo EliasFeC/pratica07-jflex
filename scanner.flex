@@ -15,27 +15,60 @@
   private String data = "";
   private String resumo = "";
   private String reivindicacoes = "";
+  private StringBuilder buffer = new StringBuilder();
 %}
 
+%state ENTRE_PATENTE
+
 // Macros
-Patente         = 7022487
-Titulo          = United\ States\ Patent
-Data            = July\ 31,\ 2003
-Resumo          = SUMMARY\ OF\ THE\ INVENTION
-Reivindicações  = Claims
+PatenteInicial  = "<TABLE WIDTH="100%">
+<TR>	<TD ALIGN="LEFT" WIDTH="50%"><B>United States Patent </B></TD>
+	<TD ALIGN="RIGHT" WIDTH="50%"><B>"
+PatenteFinal    = "</B></TD>
+</TR>
+<TR><TD ALIGN="LEFT" WIDTH="50%"><b>"
+TituloInicial   = <HR>
+<font size="+1">
+TituloFinal     = </font><BR>
+DataInicial     = <TR><TD VALIGN="TOP" ALIGN="LEFT" WIDTH="10%" NOWRAP>PCT PUB. Date: 
+     </TD><TD ALIGN="LEFT" WIDTH="90%">                    
+     <B>
+DataFinal       = </B></TD></TR>
+</TABLE>
+<HR>
+<p>
+ResumoInicial   = SUMMARY\ OF\ THE\ INVENTION
+ResumoFinal     = SUMMARY\ OF\ THE\ INVENTION
+ReivindicaçõesInicial  = Claims
+ReivindicaçõesFinal    = Claims
 
 %%
 
 //padroes encontrados
-{Patente}        { numero = yytext(); }
+// Transição de estado e inicia buffer
+{PatenteInicial} {
+  yybegin(ENTRE_PATENTE);
+  buffer.setLength(0); // limpa buffer
+}
+
+// Dentro do trecho de patente
+<ENTRE_PATENTE>{
+  {PatenteFinal} {
+    yybegin(YYINITIAL);
+    numero = buffer.toString().trim();
+  }
+  
+  [^] { buffer.append(yytext()); } // adiciona qualquer caractere ao buffer
+}
+
 {Titulo}         { titulo = yytext(); }
 {Data}           { data = yytext(); }
 {Resumo}         { resumo = yytext(); }
 {Reivindicações} { reivindicacoes = yytext(); }
 
-//fim do arquivo como os campos da patente
+
 <<EOF>> {
-  System.out.println("Patente: " + numero);
+  System.out.println("Número da Patente: " + numero);
   System.out.println("Título: " + titulo);
   System.out.println("Data de Publicação: " + data);
   System.out.println("Resumo: " + resumo);
