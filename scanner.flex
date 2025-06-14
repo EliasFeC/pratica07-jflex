@@ -18,7 +18,7 @@
   private StringBuilder buffer = new StringBuilder();
 %}
 
-%state ENTRE_PATENTE
+%state ENTRE_PATENTE, ENTRE_TITULO, ENTRE_DATA, ENTRE_RESUMO, ENTRE_REIV
 
 // Macros
 PatenteInicial  = "<TABLE WIDTH="100%">
@@ -37,35 +37,87 @@ DataFinal       = </B></TD></TR>
 </TABLE>
 <HR>
 <p>
-ResumoInicial   = SUMMARY\ OF\ THE\ INVENTION
-ResumoFinal     = SUMMARY\ OF\ THE\ INVENTION
-ReivindicaçõesInicial  = Claims
-ReivindicaçõesFinal    = Claims
+ResumoInicial   = </font><BR>
+<BR><CENTER><B>Abstract</B></CENTER>
+<P>
+ResumoFinal     = </P>
+<HR>
+<TABLE WIDTH="100%"> <TR><TD VALIGN="TOP" ALIGN="LEFT" WIDTH="10%">
+ReivindicaçõesInicial  = <HR>
+<CENTER><B><I>Claims</B></I></CENTER> <HR> <BR><BR>What is claimed is:<BR><BR>
+ReivindicaçõesFinal    = <HR> <CENTER><B><I> Description</B>
 
 %%
 
-//padroes encontrados
-// Transição de estado e inicia buffer
+// =======================
+// PATENTE
 {PatenteInicial} {
   yybegin(ENTRE_PATENTE);
-  buffer.setLength(0); // limpa buffer
+  buffer.setLength(0);
 }
 
-// Dentro do trecho de patente
-<ENTRE_PATENTE>{
-  {PatenteFinal} {
-    yybegin(YYINITIAL);
-    numero = buffer.toString().trim();
-  }
-  
-  [^] { buffer.append(yytext()); } // adiciona qualquer caractere ao buffer
+<ENTRE_PATENTE>{PatenteFinal} {
+  yybegin(YYINITIAL);
+  numero = buffer.toString().trim();
 }
 
-{Titulo}         { titulo = yytext(); }
-{Data}           { data = yytext(); }
-{Resumo}         { resumo = yytext(); }
-{Reivindicações} { reivindicacoes = yytext(); }
+<ENTRE_PATENTE>[^] { buffer.append(yytext()); }
 
+// =======================
+// TÍTULO
+{TituloInicial} {
+  yybegin(ENTRE_TITULO);
+  buffer.setLength(0);
+}
+
+<ENTRE_TITULO>{TituloFinal} {
+  yybegin(YYINITIAL);
+  titulo = buffer.toString().trim();
+}
+
+<ENTRE_TITULO>[^] { buffer.append(yytext()); }
+
+// =======================
+// DATA
+{DataInicial} {
+  yybegin(ENTRE_DATA);
+  buffer.setLength(0);
+}
+
+<ENTRE_DATA>{DataFinal} {
+  yybegin(YYINITIAL);
+  data = buffer.toString().trim();
+}
+
+<ENTRE_DATA>[^] { buffer.append(yytext()); }
+
+// =======================
+// RESUMO
+{ResumoInicial} {
+  yybegin(ENTRE_RESUMO);
+  buffer.setLength(0);
+}
+
+<ENTRE_RESUMO>{ResumoFinal} {
+  yybegin(YYINITIAL);
+  resumo = buffer.toString().trim();
+}
+
+<ENTRE_RESUMO>[^] { buffer.append(yytext()); }
+
+// =======================
+// REIVINDICAÇÕES
+{ReivindicacoesInicial} {
+  yybegin(ENTRE_REIV);
+  buffer.setLength(0);
+}
+
+<ENTRE_REIV>{ReivindicacoesFinal} {
+  yybegin(YYINITIAL);
+  reivindicacoes = buffer.toString().trim();
+}
+
+<ENTRE_REIV>[^] { buffer.append(yytext()); }
 
 <<EOF>> {
   System.out.println("Número da Patente: " + numero);
